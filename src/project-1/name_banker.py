@@ -1,18 +1,24 @@
 import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
 
 class NameBanker:
 
-    def __init__(self, model):
-        self.model = model
+    #def __init__(self, model):
+     #   self.model = model
 
     
     # Fit the model to the data.  You can use any model you like to do
     # the fit, however you should be able to predict all class
     # probabilities
     def fit(self, X, y):
+        #self.data = [X, y]
         #Her skal vi legge inn metode for modell
+        neigh = KNeighborsClassifier(n_neighbors = 3)
+        neigh.fit = fit(X, y)
+
+        return neigh.fit
         
-        self.data = [X, y]
+       
 
 
 
