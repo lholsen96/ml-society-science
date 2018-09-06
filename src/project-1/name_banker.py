@@ -2,13 +2,18 @@ import numpy as np
 
 class NameBanker:
 
-    def __init__(self, model) 
+    def __init__(self, model):
+        self.model = model
+
     
     # Fit the model to the data.  You can use any model you like to do
     # the fit, however you should be able to predict all class
     # probabilities
     def fit(self, X, y):
+        #Her skal vi legge inn metode for modell
         self.data = [X, y]
+
+
 
     # set the interest rate
     def set_interest_rate(self, rate):
