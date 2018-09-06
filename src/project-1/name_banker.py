@@ -1,28 +1,23 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 
-class NameBanker:
+class NameBanker: 
 
     #def __init__(self, model):
      #   self.model = model
+
 
     
     # Fit the model to the data.  You can use any model you like to do
     # the fit, however you should be able to predict all class
     # probabilities
     def fit(self, X, y):
-        #self.data = [X, y]
-        #Her skal vi legge inn metode for modell
         neigh = KNeighborsClassifier(n_neighbors = 3)
-        neigh.fit = fit(X, y)
-
-        return neigh.fit
+        self.model = neigh.fit(X,y)
+        return self.model
         
-       
-
-
-
-
+        
+    
     # set the interest rate
     def set_interest_rate(self, rate):
         self.rate = rate
@@ -30,7 +25,8 @@ class NameBanker:
 
     # Predict the probability of failure for a specific person with data x
     def predict_proba(self, x):
-        return 0
+        return self.model.predict_proba(x)[1]
+        
 
     # THe expected utility of granting the loan or not. Here there are two actions:
     # action = 0 do not grant the loan
