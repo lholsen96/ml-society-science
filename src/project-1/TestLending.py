@@ -9,10 +9,12 @@ features = ['checking account balance', 'duration', 'credit history',
 target = 'repaid'
 df = pandas.read_csv('../../data/credit/german.data', sep=' ',
                      names=features+[target])
+
+
 import matplotlib.pyplot as plt
 numerical_features = ['duration', 'age', 'residence time', 'installment', 'amount', 'duration', 'persons', 'credits']
-quantitative_features = list(filter(lambda x: x not in numerical_features, features))
-X = pandas.get_dummies(df, columns=quantitative_features, drop_first=True)
+categorical_features = list(filter(lambda x: x not in numerical_features, features))
+X = pandas.get_dummies(df, columns=categorical_features, drop_first=True)
 encoded_features = list(filter(lambda x: x != target, X.columns))
 
 ## Test function
@@ -41,7 +43,6 @@ def test_decision_maker(X_test, y_test, interest_rate, decision_maker):
 ### Setup model
 #import logistic_banker
 #decision_maker = logistic_banker.LogisticBanker()
-import reference_banker
 from sklearn.ensemble import BaggingClassifier
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn import linear_model
