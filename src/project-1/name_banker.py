@@ -11,7 +11,9 @@ class NameBanker:
     # probabilities
     def fit(self, X, y):
         #Her skal vi legge inn metode for modell
+        
         self.data = [X, y]
+
 
 
 
@@ -32,8 +34,14 @@ class NameBanker:
     # 2nd attribute of x. Then the return if the loan is paid off to you is amount_of_loan*(1 + rate)^length_of_loan
     # The return if the loan is not paid off is -amount_of_loan.
     def expected_utility(self, x, action):
+        if action == 0:
+            return 0
+        else:
+            prob = predict_proba(self, x)
+            return -p*x[4] + (1-p)*x[4]*((1 + x[7])**(x[1]) -1)  
+
+
         print("Expected utility: Not implemented")
-    # Return the best action. This is normally the one that maximises expected utility.
-    # However, you are allowed to deviate from this if you can justify the reason.
+        
     def get_best_action(self, x):
         return np.random.choice(2,1)[0]
