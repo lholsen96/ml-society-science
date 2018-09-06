@@ -1,6 +1,7 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
+import matplotlib.pyplot as plt
 
 class NameBanker: 
 
@@ -13,38 +14,37 @@ class NameBanker:
     # the fit, however you should be able to predict all class
     # probabilities
     def fit(self, X, y):
-       neighbor_ks = range(1,100)
-       untrained_models = [KNeighborsClassifier(n_neighbors=k) for k in neighbor]
+       self.data = [X,y] 
+       ks = range(1,100)
+       untrained_models = [KNeighborsClassifier(n_neighbors=k) for k in ks]
         
-        features = ['checking account balance', 'duration', 'credit history',
-            'purpose', 'amount', 'savings', 'employment', 'installment',
-            'marital status', 'other debtors', 'residence time',
-            'property', 'age', 'other installments', 'housing', 'credits',
-            'job', 'persons', 'phone', 'foreign']
-        target = 'repaid'
+       #features = ['checking account balance', 'duration', 'credit history', \
+       #     'purpose', 'amount', 'savings', 'employment', 'installment', \
+       #     'marital status', 'other debtors', 'residence time', \
+       #     'property', 'age', 'other installments', 'housing', 'credits', \
+       #     'job', 'persons', 'phone', 'foreign']
+       #target = 'repaid'
         
-        k_fold_scores = [cross_val_score(estimator=m), X = features, y = target, cv = 5] #skal vi ha med scaled?
+       k_fold_scores = [cross_val_score(estimator = m, X=X, y=y, cv = 5) for m in untrained_models] #skal vi ha med scaled?
         
-        mean_cv_scores = [score.mean() for score in k_fold_scores] 
-        plt.errorbar(neighbor_ks, mean_cv_scores, yerr=[score.std() for score in k_fold_scores])
+       mean_cv_scores = [score.mean() for score in k_fold_scores] 
+       plt.errorbar(ks, mean_cv_scores, yerr=[score.std() for score in k_fold_scores])
+       plt.show()
         
-        knn_best_k_cv = numpy.asarray(mean_cv_scores).argmax()
-        knn_best_k_train = numpy.asarray(train_scores).argmax()
-        knn_best_k_test = numpy.asarray(test_scores).argmax()
-        print(ks[knn_best_k_cv], ks[knn_best_k_train], ks[knn_best_k_test])
-        plt.semilogx(ks, train_scores, ks, test_scores, ks, mean_xv_scores)
-        plt.legend(["Train", "Test", "XV"])
+       knn_best_k_cv = np.asarray(mean_cv_scores).argmax()
+       #knn_best_k_train = np.asarray(train_scores).argmax()
+       #knn_best_k_test = np.asarray(test_scores).argmax()
+       #print(ks[knn_best_k_cv], ks[knn_best_k_train], ks[knn_best_k_test])
+       #plt.semilogx(ks, train_scores, ks, test_scores, ks, mean_xv_scores)
+       #plt.legend(["Train", "Test", "XV"])
 
         # Let's select the best model on the basis of the XV score, as we must, since the 'test' result is invisible to us
-        knn_best_model_cv = models[knn_best_k_cv]
-        
+       #knn_best_model_cv = models[knn_best_k_cv]
 
-
-
-
-        neigh = KNeighborsClassifier(n_neighbors = knn_best_k_cv)
-        self.model = neigh.fit(X,y)
-        return self.model
+       neigh = KNeighborsClassifier(n_neighbors = knn_best_k_cv)
+       print(knn_best_k_cv)
+       self.model = neigh.fit(X,y)
+       return self.model
         
         
     
