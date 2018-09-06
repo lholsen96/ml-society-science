@@ -23,9 +23,9 @@ class NameBanker:
         self.rate = rate
         return
 
-    # Predict the probability of failure for a specific person with data x
+    # Predict the probability of success for a specific person with data x
     def predict_proba(self, x):
-        return self.model.predict_proba(x)[1]
+        return  self.model.predict_proba(x)[0,0]
         
 
     # THe expected utility of granting the loan or not. Here there are two actions:
@@ -39,11 +39,15 @@ class NameBanker:
         if action == 0:
             return 0
         else:
-            prob = predict_proba(self, x)
-            return -p*x[4] + (1-p)*x[4]*((1 + x[7])**(x[1]) -1)  
+            p = self.predict_proba(x)
+            return -(1-p)*x[4] + p*x[4]*((1 + x[7])**(x[1]) -1)  
 
 
         print("Expected utility: Not implemented")
         
     def get_best_action(self, x):
-        return np.random.choice(2,1)[0]
+        if self.expected_utility(x, 0) > self.expected_utility(x, 1): 
+            return 0
+        else: 
+            return 1     
+    
