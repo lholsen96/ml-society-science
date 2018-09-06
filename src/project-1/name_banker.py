@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.neighbors import KNeighborsClassifier
+from sklearn.model_selection import cross_val_score
 
 class NameBanker: 
 
@@ -12,7 +13,15 @@ class NameBanker:
     # the fit, however you should be able to predict all class
     # probabilities
     def fit(self, X, y):
-        neigh = KNeighborsClassifier(n_neighbors = 3)
+       neighbor_ks = range(1,100)
+       untrained_models = [KNeighborsClassifier(n_neighbors=k) for k in neighbor]
+       k_fold_scores = [cross_val_score(estimator=m), X = df_scaled[features], y = df_scaled[target], cv = 5]
+
+
+
+
+
+        neigh = KNeighborsClassifier(n_neighbors = 4)
         self.model = neigh.fit(X,y)
         return self.model
         
@@ -40,10 +49,8 @@ class NameBanker:
             return 0
         else:
             p = self.predict_proba(x)
-            return -(1-p)*x[4] + p*x[4]*((1 + x[7])**(x[1]) -1)  
+            return -(1-p)*x[4] + p*x[4]*((1 + x[7])**(x[1]) - 1)  
 
-
-        print("Expected utility: Not implemented")
         
     def get_best_action(self, x):
         if self.expected_utility(x, 0) > self.expected_utility(x, 1): 
