@@ -59,7 +59,7 @@ knn = KNeighborsClassifier()
 logistic = linear_model.LogisticRegression()
 n_tests = 10
 
-interest_rate = 0.05
+interest_rate = 0.005
 import NameBanker
 decision_maker = NameBanker.NameBanker(logistic)
 
