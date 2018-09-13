@@ -3,7 +3,7 @@ from sklearn.neighbors import KNeighborsClassifier
 from sklearn.model_selection import cross_val_score
 import matplotlib.pyplot as plt
 
-class NameBanker: 
+class NameBankerCVKNN: 
 
     #def __init__(self, model):
      #   self.model = model
@@ -30,18 +30,12 @@ class NameBanker:
         # Calculate the cross validations scores for each of the k's with 5 folds
         k_fold_scores = [cross_val_score(estimator = model, X=X, y=y, cv = folds) for model in untrained_models] 
         
-        #skal vi ha med scaled over?
         
         # Take the mean score for each of the k's.
         # That is, originally each k has 5 cv-scores. We take the average of them.
         mean_cv_scores = [score.mean() for score in k_fold_scores] 
         
-        # Plot of the errorbars to illustrate wich k is the optimal k for KNN
-        #print("Plot of the mean cross-validation scores for the different values of k")
-        #plt.errorbar(ks, mean_cv_scores, yerr=[score.std() for score in k_fold_scores])
-        #plt.show()
-        
-        # Find the value of k that maximize the cross-validation score
+        # Find the value of k that maximize mean_cv_scores
         knn_best_k_cv = np.asarray(mean_cv_scores).argmax()
         print("The best k-value for KNN was: ", knn_best_k_cv)
 
@@ -64,7 +58,6 @@ class NameBanker:
         # We use the predict_proba function in the sklearn.neighbors.KNeighborsClassifier class.
         # Note that we add '[0,0]' at the end to only get the prob of success
         
-      #  print("Probablilities for suc and fail: ", self.model.predict_proba(x)[0])
         return  self.model.predict_proba(x)[0,0]
         
 
@@ -76,9 +69,7 @@ class NameBanker:
     # 2nd attribute of x. Then the return if the loan is paid off to you is amount_of_loan*(1 + rate)^length_of_loan
     # The return if the loan is not paid off is -amount_of_loan.
     def expected_utility(self, x, action):
-        
-        # Har han skrevet feil formel over? Han har glemt -1
-        
+                
         # We do not grant the loan. Thus, the utility it set equal to zero.
         if action == 0:
             return 0
@@ -90,8 +81,6 @@ class NameBanker:
             amount = x['amount']
             duration = x['duration']
             returnValue = -failure*amount + success*amount*(pow(1 + self.rate, duration) - 1) 
-            #print ("Expected util: %.2f \t ", % returnValue, "Success: ", success, "Amount: ", amount, "Duration: ", duration, "\n")
-            #print ("Util: %.2f \t Success: %.2f Amount: %d Duration: %d \n" % (returnValue, success, amount, duration))
             return returnValue
 
     # Here we calculate the best action based on which action returns the highest
