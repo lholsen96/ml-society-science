@@ -26,7 +26,6 @@ class NameBanker:
         # We use the predict_proba function in the sklearn.neighbors.KNeighborsClassifier class.
         # Note that we add '[0,0]' at the end to only get the prob of success
         
-        #print("Probablilities for suc and fail: ", self.model.predict_proba(x)[0])
         return  self.model.predict_proba(x)[0,0]
         
 
@@ -50,8 +49,6 @@ class NameBanker:
             amount = x['amount']
             duration = x['duration']
             returnValue = -failure*amount + success*amount*(pow(1 + self.rate, duration) - 1) 
-            #print ("Expected util: %.2f \t ", % returnValue, "Success: ", success, "Amount: ", amount, "Duration: ", duration, "\n")
-            print ("Util: %.2f \t Success: %.2f Amount: %d Duration: %d \n" % (returnValue, success, amount, duration))
             return returnValue
 
     # Here we calculate the best action based on which action returns the highest
