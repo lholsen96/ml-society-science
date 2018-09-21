@@ -24,7 +24,7 @@ encoded_features = list(filter(lambda x: x != target, X.columns))
 
 def add_noise(X, numerical_features, categorical_features):
     #coinflip for categorical variables
-    epsilon = 1
+    epsilon = 100
     k = np.shape(X)[1]
 
     flip_fraction = 1/ (1  + np.exp(epsilon/k))
@@ -39,7 +39,7 @@ def add_noise(X, numerical_features, categorical_features):
             # For numerical features, it is different. The scaling factor should depend on k, \epsilon, and the sensitivity of that particular attribite. In this case, it's simply the range of the attribute.
             if any(c.startswith(i) for i in numerical_features):
                 # calculate the range of the attribute and add the laplace noise to the original data
-                M = np.max(X.loc[t,c]) - np.min(X.loc[t,c])
+                M = np.max(X.loc[:,c]) - np.min(X.loc[:,c])
                 l = M*k/(epsilon)
                 w = np.random.laplace(0, l)   
                 X_noise.loc[t,c] += w 
@@ -86,50 +86,33 @@ knn = KNeighborsClassifier()
 logistic = linear_model.LogisticRegression()
 n_tests = 10
 
+
 interest_rate = 0.005
-import NameBanker
-decision_maker = NameBanker.NameBanker(logistic)
 
 
-from sklearn.model_selection import train_test_split
-utility_generic = 0.0
-for iter in range(n_tests):
-    X_train, X_test, y_train, y_test = train_test_split(X[encoded_features], X[target], test_size=0.2)
-    decision_maker.set_interest_rate(interest_rate)
-    decision_maker.fit(X_train, y_train)
-    utility_generic += test_decision_maker(X_test, y_test, interest_rate, decision_maker)
+def calculate_utility(n_tests, X, encoded_features, numerical_features, categorical_features, target, decision_maker, interest_rate, noise = False):
+    from sklearn.model_selection import train_test_split
+    utility = 0.0
+    for iter in range(n_tests):
+        X_train, X_test, y_train, y_test = train_test_split(X[encoded_features], X[target], test_size=0.2)
+        decision_maker.set_interest_rate(interest_rate)
+        decision_maker.fit(X_train, y_train)
+        if noise == True: 
+            X_test = add_noise(X_test, numerical_features, categorical_features)
+        utility += test_decision_maker(X_test, y_test, interest_rate, decision_maker)
+    return utility    
 
 
 import random_banker
-decision_maker = random_banker.RandomBanker()
-
-
-
-from sklearn.model_selection import train_test_split
-utility_random = 0
-for iter in range(n_tests):
-    X_train, X_test, y_train, y_test = train_test_split(X[encoded_features], X[target], test_size=0.2)
-    decision_maker.set_interest_rate(interest_rate)
-    decision_maker.fit(X_train, y_train)
-    print("adding noise to test set")
-    X_test = add_noise(X_test, numerical_features, categorical_features)
-    utility_random += test_decision_maker(X_test, y_test, interest_rate, decision_maker)
-
-
 import NameBankerCVKNN
-decision_maker = NameBankerCVKNN.NameBankerCVKNN()
-  
+import NameBanker
 
-from sklearn.model_selection import train_test_split
-utility_CVKNN = 0.0
-for iter in range(n_tests):
-    X_train, X_test, y_train, y_test = train_test_split(X[encoded_features], X[target], test_size=0.2)
-    decision_maker.set_interest_rate(interest_rate)
-    decision_maker.fit(X_train, y_train)
-    
-    print("adding noise to test set")
-    X_test = add_noise(X_test, numerical_features, categorical_features)
-    utility_CVKNN += test_decision_maker(X_test, y_test, interest_rate, decision_maker)
+
+utility_random = calculate_utility(n_tests, X, encoded_features, numerical_features, categorical_features, target, random_banker.RandomBanker(), interest_rate, noise = True)
+utility_CVKNN = calculate_utility(n_tests, X, encoded_features, numerical_features, categorical_features, target, NameBankerCVKNN.NameBankerCVKNN(), interest_rate, noise = True)
+utility_generic = calculate_utility(n_tests, X, encoded_features, numerical_features, categorical_features, target, NameBanker.NameBanker(logistic), interest_rate, noise = True)
+
+
 
 print("NameBanker CV KNN: %.2f" % (utility_CVKNN/ n_tests))
 print("NameBanker Generic: %.2f" % (utility_generic/ n_tests))
