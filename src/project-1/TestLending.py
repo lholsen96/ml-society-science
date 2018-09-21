@@ -1,4 +1,5 @@
 import pandas
+import numpy as np
 from sklearn.preprocessing import StandardScaler
 
 ## Set up for dataset
@@ -21,11 +22,37 @@ X = pandas.get_dummies(df, columns=categorical_features, drop_first=True)
 encoded_features = list(filter(lambda x: x != target, X.columns))
 
 
+def add_noise(X, numerical_features, categorical_features):
+    #coinflip for categorical variables
+    epsilon = 1
+    k = np.shape(X)[1]
+
+    flip_fraction = 1/ (1  + np.exp(epsilon/k))
+
+    X_noise = X.copy()
+    for t in list(X_noise.index):
+         for c in X_noise.columns:
+            # We can use the same random response mechanism for all binary features
+            if any(c.startswith(i) for i in categorical_features):
+                w = np.random.choice([0, 1], p=[1 - flip_fraction, flip_fraction])
+                X_noise.loc[t,c] = (X_noise.loc[t,c] + w) % 2
+            # For numerical features, it is different. The scaling factor should depend on k, \epsilon, and the sensitivity of that particular attribite. In this case, it's simply the range of the attribute.
+            if any(c.startswith(i) for i in numerical_features):
+                # calculate the range of the attribute and add the laplace noise to the original data
+                M = np.max(X.loc[t,c]) - np.min(X.loc[t,c])
+                l = M*k/(epsilon)
+                w = np.random.laplace(0, l)   
+                X_noise.loc[t,c] += w 
+
+    return X_noise            
+
+
+
+
 ## Test function
 def test_decision_maker(X_test, y_test, interest_rate, decision_maker):
     n_test_examples = len(X_test)
     utility = 0
-
     ## Example test function - this is only an unbiased test if the data has not been seen in training
     for t in range(n_test_examples):
         action = decision_maker.get_best_action(X_test.iloc[t])
@@ -34,7 +61,7 @@ def test_decision_maker(X_test, y_test, interest_rate, decision_maker):
         amount = X_test['amount'].iloc[t]
         # If we don't grant the loan then nothing happens
         if (action==1):
-            if (good_loan == 1):
+            if (good_loan == 2):
                 utility -= amount
             else:    
                 utility += amount*(pow(1 + interest_rate, duration) - 1)
@@ -77,12 +104,15 @@ import random_banker
 decision_maker = random_banker.RandomBanker()
 
 
+
 from sklearn.model_selection import train_test_split
 utility_random = 0
 for iter in range(n_tests):
     X_train, X_test, y_train, y_test = train_test_split(X[encoded_features], X[target], test_size=0.2)
     decision_maker.set_interest_rate(interest_rate)
     decision_maker.fit(X_train, y_train)
+    print("adding noise to test set")
+    X_test = add_noise(X_test, numerical_features, categorical_features)
     utility_random += test_decision_maker(X_test, y_test, interest_rate, decision_maker)
 
 
@@ -97,6 +127,8 @@ for iter in range(n_tests):
     decision_maker.set_interest_rate(interest_rate)
     decision_maker.fit(X_train, y_train)
     
+    print("adding noise to test set")
+    X_test = add_noise(X_test, numerical_features, categorical_features)
     utility_CVKNN += test_decision_maker(X_test, y_test, interest_rate, decision_maker)
 
 print("NameBanker CV KNN: %.2f" % (utility_CVKNN/ n_tests))
