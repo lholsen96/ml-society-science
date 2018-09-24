@@ -1,0 +1,33 @@
+\documentclass[12pt]{article}
+\usepackage{microtype}
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{bm} 
+\usepackage{dsfont}
+\usepackage[utf8x]{inputenc}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{float}
+
+
+\begin{document}
+
+\begin{center}
+IN-STK5000 Project 1 \\
+\end{center}
+\section{}
+There exists no way to be sure that the policy of the model maximizes revenue. The training set is limited, and we do not know if it contains biases or errors. Because of this, we should not trust the model blindly. The best model would of course one that awarded a loan to everyone that will be able to pay it back, and to no one that are not able to pay it back. However, this seems unrealistic, as even the most reliable customer may come in a situation where she cannot pay her bills. 
+
+Our goal should be that the machine policy makes, at least, as good loan predictions as the human model. This way, we will not lose money compared to current earnings, and it will hopefully reduce the number of working hours the company spends on loan decisions. 
+
+The training data used to build the decision model may not be perfect. There may be several problems here. First of all, the data is old. The Deutsche Mark was replaced by the Euro in 1999, so the data is at least 19 years old.Another problem with the Mark is that, if the data is to be used now, we need to "translate" the currency into the currency that the bank will lend out. There is quite a difference of asking for a loan of 1 million DM and 1 million NOK. 
+
+ Another fact that might be a problem is that the data is German, and it might not be optimal for a Norwegian bank (or a bank in a country other than Germany) to use this data, as the conditions are different in different countries.    
+
+
+To minimize the risk of losing money, we should introduce this model gradually, assessing the results as time passes. If the results are good, the machine learning model, can gradually substitute the human model. If the results from the machine policy are bad, one could retrain the model, using data from 
+
+
+There may also be more problems than losing money. The human decisions that the training data is based on may be biased, and when the model is trained on this data, the model will also make biased decisions. Maybe the machine model will be less likely to give a loan to a woman than to a man, even though they earn the same amount of money and have the same amount of money in the bank. This is prohibited by law in many countries, and so we should try to limit the bias of the decisions. A solution to this might be to remove columns from the data that contain the information that should not affect the loan decision. E.g gender, relationship status, and whether the person is a foreign worker or not. This still might not be entirely perfect as these columns might be correlated with other columns in the data set. 
+
+\end{document}
