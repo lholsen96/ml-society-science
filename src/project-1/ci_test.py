@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import beta
 import matplotlib.pyplot as plt
+import seaborn
 
 ## amount of data
 data = pd.read_csv("data.csv")
@@ -11,6 +12,25 @@ data = pd.read_csv("data.csv")
 
 
 ## Firstly X is independent of all else
+
+
+
+relative_counts = pd.DataFrame(
+    {i: data.A.value_counts() / data.A.count() for i, data in data.groupby(['foreign_A202', 'y'])})
+
+print(relative_counts)
+
+relative_counts.plot.bar().legend(bbox_to_anchor = (1,1))
+
+
+
+
+
+#plt.hist(non_foreign_rejected_ratio_good, non_foreign_rejected_ratio_bad)
+plt.show()
+
+
+
 X = data.drop(["y", "A", "foreign_A202"], axis = 1)
 Y = data["y"].as_matrix()
 Z = data["foreign_A202"].as_matrix()
