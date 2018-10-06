@@ -50,14 +50,23 @@ interest_rate = 0.05
 
 ### Do a number of preliminary tests by splitting the data in parts
 from sklearn.model_selection import train_test_split
-n_tests = 10
+n_tests = 1
 utility = 0
 for iter in range(n_tests):
-    X_train, X_test, y_train, y_test = train_test_split(X[encoded_features], X[target], test_size=0.2)
+    X_train, X_test, y_train, y_test = train_test_split(X[encoded_features], X[target], test_size=0.5)
+
+    #Make test set with opposite value of foreign_A202, everything else the same. 
+    X_test_opposite_foreign = X_test.copy() 
+    X_test_opposite_foreign["foreign_A202"] = [1 if v == 0 else 0 for v in X_test_opposite_foreign["foreign_A202"]]    
+
+
     decision_maker.set_interest_rate(interest_rate)
+
+
     decision_maker.fit(X_train, y_train)
     
     a = []
+
     for i in range(X_test.shape[0]):
         a.append(decision_maker.get_best_action(X_test.iloc[i,:]))
     
@@ -69,7 +78,9 @@ X_test["A"] = se.values
 X_test["y"] = y_test.values
 
 
-print(X_test)
+
+
+#print(X_test)
 X_test.to_csv("data.csv")
 
 
