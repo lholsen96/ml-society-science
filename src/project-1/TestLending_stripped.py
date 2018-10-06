@@ -66,22 +66,31 @@ for iter in range(n_tests):
     decision_maker.fit(X_train, y_train)
     
     a = []
+    a_opposite_foreign = []
 
     for i in range(X_test.shape[0]):
         a.append(decision_maker.get_best_action(X_test.iloc[i,:]))
+        a_opposite_foreign.append(decision_maker.get_best_action(X_test_opposite_foreign.iloc[i,:]))
     
     utility += test_decision_maker(X_test, y_test, interest_rate, decision_maker)
 
 #print(utility / n_tests)
 se = pandas.Series(a)
+se_opposite_foreign = pandas.Series(a_opposite_foreign)
+
 X_test["A"] = se.values
 X_test["y"] = y_test.values
+
+X_test_opposite_foreign["A"] = se_opposite_foreign.values
+X_test_opposite_foreign["y"] = y_test.values
+
 
 
 
 
 #print(X_test)
 X_test.to_csv("data.csv")
+X_test_opposite_foreign.to_csv("data_opposite_foreign.csv")
 
 
 
