@@ -7,8 +7,16 @@ import seaborn
 
 ## amount of data
 data = pd.read_csv("data.csv")
+data_o_f = pd.read_csv("data_opposite_foreign.csv")
+
+print("variation: ")
+variation = sum(data["A"].subtract(data_o_f["A"]))
+
+print(variation)
 
 
+
+#make duplicate of data, but with different value of 
 
 
 ## Firstly X is independent of all else
