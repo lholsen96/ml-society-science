@@ -9,36 +9,41 @@ import seaborn
 data = pd.read_csv("data.csv")
 data_o_f = pd.read_csv("data_opposite_foreign.csv")
 
+
+#Variasjon mellom 
 print("variation: ")
-variation = sum(data["A"].subtract(data_o_f["A"]))
+variation = sum(abs(data["A"].subtract(data_o_f["A"])))
 
-print(variation)
+#uten absoluttverdi: 
+variation_2 = sum(data["A"].subtract(data_o_f["A"]))
 
-
-
-#make duplicate of data, but with different value of 
-
-
-## Firstly X is independent of all else
+data["Different"] = data.A != data_o_f.A
 
 
+#Define amount categories as high >10 000, 10 000 > medium > 1 000, low < 1 000. 
+data["amount category"] = ["high" if v > 10000 else "low" if v < 1000 else "medium" for v in data["amount"]]
+
+
+data_low = data.loc[data["amount category"] == "low"]
+print(data_low)
+
+
+df = data
 
 relative_counts = pd.DataFrame(
-    {i: data.A.value_counts() / data.A.count() for i, data in data.groupby(['foreign_A202', 'y'])})
+    {i: d.A.value_counts() / d.A.count() for i, d in df.groupby(['foreign_A202', 'y'])})
 
-print(relative_counts)
+#print(relative_counts)
 
 relative_counts.plot.bar().legend(bbox_to_anchor = (1,1))
 
-
-
-
-
-#plt.hist(non_foreign_rejected_ratio_good, non_foreign_rejected_ratio_bad)
 plt.show()
 
 
 
+
+
+## Firstly X is independent of all else
 X = data.drop(["y", "A", "foreign_A202"], axis = 1)
 Y = data["y"].as_matrix()
 Z = data["foreign_A202"].as_matrix()
@@ -117,7 +122,7 @@ for y in [1, 2]:
     plt.plot(xplot, pdf_p)
     plt.plot(xplot, pdf_n)
     plt.plot(xplot, pdf_m) 
-    plt.legend(["z=1", "z=-1", "marginal"])
+    plt.legend(["z=1", "z=0", "marginal"])
     plt.title("y=" + str(y))
     
 #plt.show()
