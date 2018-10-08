@@ -25,23 +25,44 @@ data["amount category"] = ["high" if v > 10000 else "low" if v < 1000 else "medi
 
 
 data_low = data.loc[data["amount category"] == "low"]
-print(data_low)
+data_medium = data.loc[data["amount category"] == "medium"]
+data_high = data.loc[data["amount category"] == "high"]
+
 
 
 df = data
-
 relative_counts = pd.DataFrame(
     {i: d.A.value_counts() / d.A.count() for i, d in df.groupby(['foreign_A202', 'y'])})
 
-#print(relative_counts)
 
-relative_counts.plot.bar().legend(bbox_to_anchor = (1,1))
 
+
+
+df1 = data_low
+relative_counts1 = pd.DataFrame(
+    {i: d.A.value_counts()/d.A.count() for i, d in df1.groupby(["foreign_A202", "y"])})
+relative_counts1.plot.bar().legend(bbox_to_anchor = (1,1))
+plt.title("Low amount")
+plt.savefig("low_amount.png")
 plt.show()
 
+df2 = data_medium
+relative_counts2 = pd.DataFrame(
+    {i: d.A.value_counts()/d.A.count() for i, d in df2.groupby(["foreign_A202", "y"])})
 
+relative_counts2.plot.bar().legend(bbox_to_anchor = (1,1))
+plt.title("Medium amount")
+plt.savefig("medium_amount.png")
+plt.show
 
+df3 = data_high
+relative_counts3 = pd.DataFrame(
+    {i: d.A.value_counts()/d.A.count() for i, d in df3.groupby(["foreign_A202", "y"])})
 
+relative_counts3.plot.bar().legend(bbox_to_anchor = (1,1))
+plt.title("High amount")
+plt.savefig("high_amount.png")
+plt.show()
 
 ## Firstly X is independent of all else
 X = data.drop(["y", "A", "foreign_A202"], axis = 1)
