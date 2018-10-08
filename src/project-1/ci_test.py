@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 from scipy.stats import beta
 import matplotlib.pyplot as plt
-import seaborn
 
 ## amount of data
 data = pd.read_csv("data.csv")
@@ -13,6 +12,7 @@ data_o_f = pd.read_csv("data_opposite_foreign.csv")
 #Variasjon mellom 
 print("variation: ")
 variation = sum(abs(data["A"].subtract(data_o_f["A"])))
+print(variation)
 
 #uten absoluttverdi: 
 variation_2 = sum(data["A"].subtract(data_o_f["A"]))
@@ -22,12 +22,16 @@ data["Different"] = data.A != data_o_f.A
 
 #Define amount categories as high >10 000, 10 000 > medium > 1 000, low < 1 000. 
 data["amount category"] = ["high" if v > 10000 else "low" if v < 1000 else "medium" for v in data["amount"]]
-
+data_o_f["amount category"] = ["high" if v > 10000 else "low" if v < 1000 else "medium" for v in data_o_f["amount"]]
 
 data_low = data.loc[data["amount category"] == "low"]
 data_medium = data.loc[data["amount category"] == "medium"]
 data_high = data.loc[data["amount category"] == "high"]
 
+
+data_o_f_low = data_o_f.loc[data["amount category"] == "low"]
+data_o_f_medium = data_o_f.loc[data["amount category"] == "medium"]
+data_o_f_high = data_o_f.loc[data["amount category"] == "high"]
 
 
 df = data
@@ -39,30 +43,59 @@ relative_counts = pd.DataFrame(
 
 
 df1 = data_low
+df_o_f1 = data_o_f_low
+
 relative_counts1 = pd.DataFrame(
     {i: d.A.value_counts()/d.A.count() for i, d in df1.groupby(["foreign_A202", "y"])})
 relative_counts1.plot.bar().legend(bbox_to_anchor = (1,1))
 plt.title("Low amount")
 plt.savefig("low_amount.png")
-plt.show()
+
+
+relative_counts1_o_f = pd.DataFrame(
+    {i: d.A.value_counts()/d.A.count() for i, d in df_o_f1.groupby(["foreign_A202", "y"])})
+relative_counts1_o_f.plot.bar().legend(bbox_to_anchor = (1,1))
+plt.title("Low amount, opposite foreign")
+plt.savefig("low_amount_o_f.png")
+
+
 
 df2 = data_medium
+df_o_f2 = data_o_f_medium
+
 relative_counts2 = pd.DataFrame(
     {i: d.A.value_counts()/d.A.count() for i, d in df2.groupby(["foreign_A202", "y"])})
 
 relative_counts2.plot.bar().legend(bbox_to_anchor = (1,1))
 plt.title("Medium amount")
 plt.savefig("medium_amount.png")
-plt.show
+
+
+
+relative_counts2_o_f = pd.DataFrame(
+    {i: d.A.value_counts()/d.A.count() for i, d in df_o_f2.groupby(["foreign_A202", "y"])})
+
+relative_counts2_o_f.plot.bar().legend(bbox_to_anchor = (1,1))
+plt.title("Medium amount, opposite foreign")
+plt.savefig("medium_amount_o_f.png")
 
 df3 = data_high
+df_o_f3 = data_o_f_high
+
 relative_counts3 = pd.DataFrame(
     {i: d.A.value_counts()/d.A.count() for i, d in df3.groupby(["foreign_A202", "y"])})
 
 relative_counts3.plot.bar().legend(bbox_to_anchor = (1,1))
 plt.title("High amount")
 plt.savefig("high_amount.png")
-plt.show()
+
+
+relative_counts3_o_f = pd.DataFrame(
+    {i: d.A.value_counts()/d.A.count() for i, d in df_o_f3.groupby(["foreign_A202", "y"])})
+
+relative_counts3_o_f.plot.bar().legend(bbox_to_anchor = (1,1))
+plt.title("High amount, opposite foreign")
+plt.savefig("high_amount_o_f.png")
 
 ## Firstly X is independent of all else
 X = data.drop(["y", "A", "foreign_A202"], axis = 1)
