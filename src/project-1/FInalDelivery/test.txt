@@ -1,1 +1,23 @@
+TestLending_stripped.py: (needs 'german-manwoman.data')
+	Calculates the relative counts and produce histograms of our policy's decisions.
 
+TestLending_stripped2.py: (needs 'german.data')
+	Makes a logistic model. Create two different test sets where we change the value of
+	foreign_A202. Check the variation between what our policy decides in the two scenarios.
+
+TestLending_stripped.py: (needs 'german-manwoman.data')
+	Makes a logistic model. Calculates the relative counts and produce histograms 
+	of our policy's decisions. Also makes two different testsets with gender switched.
+	Check the variation between what our policy decides in the two scenarios.
+
+TestLending3.py: (needs 'german.data')
+	Calculate the utility given different epsilons (differential privacy)
+
+NameBankerCVKNN.py
+	Creates a KNN model by first doing a cross-validation to find the optimal k.
+
+NameBanker.py
+	A generic banker. We use it for the logistic model.
+
+RandomBanker.py
+	A banker that makes random decisions.
