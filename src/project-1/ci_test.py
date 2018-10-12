@@ -18,6 +18,7 @@ print(variation)
 variation_2 = sum(data["A"].subtract(data_o_f["A"]))
 
 data["Different"] = data.A != data_o_f.A
+print((data.loc[data["Different"] == True]).shape[0])
 
 
 #Define amount categories as high >10 000, 10 000 > medium > 1 000, low < 1 000. 
@@ -179,4 +180,4 @@ for y in [1, 2]:
     plt.legend(["z=1", "z=0", "marginal"])
     plt.title("y=" + str(y))
     
-#plt.show()
+plt.show()
