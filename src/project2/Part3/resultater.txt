@@ -27,3 +27,40 @@ Logistic:         53.0000
 Logistic cluster: 47.0000
 Neural Network:   59.0000
 NN cluster:       45.0000
+
+
+Total rewards (max is 100):
+Treatment   1:    59.0000
+Treatment   2:    52.0000
+Treatment 127:    17.0000
+Treatment  51:     6.0000
+Treatment  92:     6.0000
+Treatment  28:     5.0000
+Treatment 115:     5.0000
+Treatment  95:     5.0000
+Treatment  86:     4.0000
+Treatment  74:     4.0000
+Random:           28.0000
+Historical:       17.0000
+Logistic:         57.0000
+Logistic cluster: 39.0000
+Neural Network:   56.0000
+NN cluster:       51.0000
+
+Total rewards (max is 100):
+Treatment   2:    52.0000
+Treatment   1:    50.0000
+Treatment 127:     8.0000
+Treatment  26:     6.0000
+Treatment  86:     5.0000
+Treatment  25:     5.0000
+Treatment  23:     4.0000
+Treatment  87:     4.0000
+Treatment 106:     4.0000
+Treatment  49:     4.0000
+Random:           27.0000
+Historical:        9.0000
+Logistic:         52.0000
+Logistic cluster: 59.0000
+Neural Network:   56.0000
+NN cluster:       60.0000
