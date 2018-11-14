@@ -1,0 +1,10 @@
+Test_policy med reward_function
+
+Lar vi a alltid være null(placebo) så ligger den på ish [0,2] i utility (kjørt 100 tester).
+Lar vi a alltid være 1(drug) så ligger den på [37,42,44,46,49]. ligger vanligvis på 44
+Lar vi a være random (np.choice) så ligger den på [20,25].
+
+Kjører vi logistikk(med observe) ligger den på [39,45,54].
+Kjører vi med NN(med observe) så får vi [38,49].
+Historical ligger på [8,12].
+Så de nye modellene er mye bedre, men kunne like godt alltid gitt medisin.
