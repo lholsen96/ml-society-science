@@ -9,7 +9,9 @@ Kjører vi med NN(med observe) så får vi [38,49].
 Historical ligger på [8,12].
 Så de nye modellene er mye bedre, men kunne like godt alltid gitt medisin.
 
-Testet med n_tests = 100. Kjøretid 16 min
+Testet med n_tests = 100. Kjøretid 16 min. Total reward is just the number of treated pasients. 
+we do not give a negative reward -a for using a treatment. That means that we do not imply that the active treatment must be at least
+a*100% more effective than the placebo.
 Total rewards (max is 100):
 Treatment   2:    56.0000
 Treatment   1:    55.0000
@@ -64,3 +66,203 @@ Logistic:         52.0000
 Logistic cluster: 59.0000
 Neural Network:   56.0000
 NN cluster:       60.0000
+
+Total rewards (max is 100):
+Treatment   1:    60.0000
+Treatment   2:    55.0000
+Treatment 127:    10.0000
+Treatment  86:     7.0000
+Treatment 126:     5.0000
+Treatment  75:     5.0000
+Treatment  80:     4.0000
+Treatment  31:     4.0000
+Treatment  70:     4.0000
+Treatment  28:     4.0000
+Random:           32.0000
+Historical:       10.0000
+Logistic:         44.0000
+Logistic cluster: 56.0000
+Neural Network:   55.0000
+NN cluster:       53.0000
+
+Total rewards (max is 100):
+Treatment   1:      57.0000
+Treatment   2:      54.0000
+Treatment 127:       8.0000
+Treatment  45:       7.0000
+Treatment   9:       7.0000
+Treatment 114:       5.0000
+Treatment   7:       5.0000
+Treatment  10:       5.0000
+Treatment  86:       5.0000
+Treatment 103:       5.0000
+Random:             37.0000
+Historical:          9.0000
+Logistic:           48.0000
+Logistic no update: 51.0000
+Logistic cluster:   50.0000
+Neural Network:     61.0000
+NN no update:       52.0000
+NN cluster:         61.0000
+
+Total rewards (max is 100):
+Treatment   2:      56.0000
+Treatment   1:      47.0000
+Treatment  64:       8.0000
+Treatment 127:       8.0000
+Treatment 103:       6.0000
+Treatment  86:       6.0000
+Treatment  42:       5.0000
+Treatment  28:       5.0000
+Treatment  98:       5.0000
+Treatment  46:       4.0000
+Random:             28.0000
+Historical:         14.0000
+Logistic:           56.0000
+Logistic no update: 59.0000
+Logistic cluster:   49.0000
+Neural Network:     49.0000
+NN no update:       58.0000
+NN cluster:         43.0000
+
+Total rewards (max is 100):
+Treatment   1:      63.0000
+Treatment   2:      53.0000
+Treatment 127:      10.0000
+Treatment  82:       6.0000
+Treatment  61:       5.0000
+Treatment  15:       5.0000
+Treatment 102:       5.0000
+Treatment  28:       5.0000
+Treatment  49:       4.0000
+Treatment 117:       4.0000
+Random:             33.0000
+Historical:         14.0000
+Logistic:           62.0000
+Logistic no update: 49.0000
+Logistic cluster:   55.0000
+Neural Network:     53.0000
+NN no update:       56.0000
+NN cluster:         54.0000
+
+Total rewards (max is 100):
+Treatment   2:      59.0000
+Treatment   1:      57.0000
+Treatment 127:      10.0000
+Treatment  86:       8.0000
+Treatment  22:       6.0000
+Treatment  19:       5.0000
+Treatment 103:       5.0000
+Treatment   9:       5.0000
+Treatment  11:       4.0000
+Treatment  85:       4.0000
+Random:             31.0000
+Historical:          9.0000
+Logistic:           54.0000
+Logistic no update: 53.0000
+Logistic cluster:   52.0000
+Neural Network:     50.0000
+NN no update:       48.0000
+NN cluster:         61.0000
+
+Total rewards (max is 100):
+Treatment   2:      58.0000
+Treatment   1:      54.0000
+Treatment  86:       7.0000
+Treatment 127:       7.0000
+Treatment 126:       5.0000
+Treatment  74:       5.0000
+Treatment  46:       5.0000
+Treatment  22:       5.0000
+Treatment  18:       5.0000
+Treatment  16:       5.0000
+Random:             31.0000
+Historical:         17.0000
+Logistic:           55.0000
+Logistic no update: 51.0000
+Logistic cluster:   56.0000
+Neural Network:     39.0000
+NN no update:       60.0000
+NN cluster:         52.0000
+
+Total rewards (max is 100):
+Treatment   2:      55.0000
+Treatment   1:      52.0000
+Treatment 127:      11.0000
+Treatment  28:       9.0000
+Treatment  86:       7.0000
+Treatment  50:       6.0000
+Treatment  93:       5.0000
+Treatment  45:       5.0000
+Treatment  47:       5.0000
+Treatment  94:       5.0000
+Random:             32.0000
+Historical:          7.0000
+Logistic:           61.0000
+Logistic no update: 54.0000
+Logistic cluster:   53.0000
+Neural Network:     52.0000
+NN no update:       53.0000
+NN cluster:         56.0000
+
+
+Total rewards (max is 100):
+Treatment   2:      54.0000
+Treatment   1:      53.0000
+Treatment 127:       9.0000
+Treatment  86:       8.0000
+Treatment  63:       5.0000
+Treatment   7:       5.0000
+Treatment  94:       5.0000
+Treatment  32:       4.0000
+Treatment  50:       4.0000
+Treatment 114:       4.0000
+Random:             35.0000
+Historical:         17.0000
+Logistic:           56.0000
+Logistic no update: 52.0000
+Logistic cluster:   57.0000
+Neural Network:     53.0000
+NN no update:       56.0000
+NN cluster:         54.0000
+
+From here on I set the seed. So we test the same 100 persons for each model.
+Total rewards (max is 100):
+Treatment   2:      57.0000
+Treatment   1:      51.0000
+Treatment 127:       8.0000
+Treatment  86:       6.0000
+Treatment  75:       4.0000
+Treatment  28:       4.0000
+Treatment  26:       4.0000
+Treatment  11:       4.0000
+Treatment   9:       4.0000
+Treatment  64:       4.0000
+Random:             35.0000
+Historical:          8.0000
+Logistic:           51.0000
+Logistic no update: 51.0000
+Logistic cluster:   51.0000
+Neural Network:     51.0000
+NN no update:       51.0000
+NN cluster:         50.0000
+
+Total rewards (max is 100):
+Treatment   1:      48.0000
+Treatment   2:      43.0000
+Treatment 127:       5.0000
+Treatment  11:       5.0000
+Treatment 106:       4.0000
+Treatment 111:       4.0000
+Treatment  26:       4.0000
+Treatment  92:       4.0000
+Treatment   9:       4.0000
+Treatment  86:       4.0000
+Random:             44.0000
+Historical:          8.0000
+Logistic:           48.0000
+Logistic no update: 48.0000
+Logistic cluster:   48.0000
+Neural Network:     48.0000
+NN no update:       48.0000
+NN cluster:         47.0000
