@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Nov 15 13:14:14 2018
+
+@author: Lars
+"""
+
 # -*- Mode: python -*-
 # A simple reference recommender
 #
@@ -21,11 +28,11 @@
 # - observe
 
 from sklearn import linear_model
-from sklearn.neural_network import MLPClassifier
+from sklearn.linear_model import LogisticRegression
 import numpy as np
 import pandas
 
-class NNRecommender:
+class LogisticRecommenderBoot:
 
     #################################
     # Initialise
@@ -101,18 +108,38 @@ class NNRecommender:
         
 
         print("Fitting treatment outcomes")
-
-        # We choose a NN model 
-        self.model = MLPClassifier(solver='lbfgs', alpha=1e-5,
-                                  hidden_layer_sizes=(5, 2), random_state=1)
+        
+        # Number of models
+        n_models = 10
+        
+        # We need to train ten models
+        self.model = [LogisticRegression(random_state=0, solver='lbfgs') for _ in range(n_models)] 
+        
+        # We need to make bootstrap samples
+        for i in range(n_models):
+            # Combine data and actions into a common dataset
+            data2 = pandas.DataFrame(self.data)
+            data2['a'] = self.actions
+            
+            data_boot_indices = np.random.choice(data2.shape[0], size = data2.shape[0], replace = True)  
+            data_boot = data2.values
+            data_boot = data_boot[data_boot_indices, :]
+            
+            
+            self.model[i].fit(data_boot, np.ravel(self.outcome[data_boot_indices]))
+        
+        print("Done fitting the ten models")
+            
+        """
+        # We choose a logistic regression model 
+        self.model = LogisticRegression(random_state=0, solver='lbfgs')
        
-
         # Combine data and actions into a common dataset
         data2 = pandas.DataFrame(self.data)
         data2['a'] = self.actions
 
-        # We train the Neural Network
-        self.model.fit(data2.values, np.ravel(self.outcome))
+        # We train the Logistic model 
+        self.model.fit(data2.values, np.ravel(self.outcome))"""
         return None
 
 
@@ -133,7 +160,7 @@ class NNRecommender:
         
         else:    
             # We have a policy
-            # we assume it is an object of class NNRecommender, which has been fitted
+            # we assume it is an object of class LogisticRecommender, which has been fitted
             # If the policy has not been fitted we return -infinity
             if (policy.fitted == False):
                 return -float('inf')
@@ -147,7 +174,7 @@ class NNRecommender:
             for row in range(data.shape[0]):
                 # Fancy printout
                 if ((row + 1) % 100) == 0:
-                    print("Neural Network estimating utility %6d of %d" % (row + 1, data.shape[0]))
+                    print("Logistic model estimating utility %6d of %d" % (row + 1, data.shape[0]))
 
                 # This iteration's data
                 iter_data = np.array(data[row].reshape(1,130))
@@ -179,7 +206,9 @@ class NNRecommender:
         # Combine the data and action/treatment.
         data2 = pandas.DataFrame(data)
         data2['a'] = treatment 
-        return self.model.predict_proba(data2)
+        
+        # for each of the n_models we need to get the predict proba
+        return [self.model[i].predict_proba(data2)[0,:] for i in range(10)]
     
     # Return recommendations for a specific user datum
     # This should be an integer in range(self.n_actions)
@@ -195,14 +224,29 @@ class NNRecommender:
         placebo_prob_outcomes = self.predict_proba(user_data, 0)
         drug_prob_outcomes = self.predict_proba(user_data, 1)
         
+        #print(drug_prob_outcomes)
+        
+        #print(len(drug_prob_outcomes))
+        #print(drug_prob_outcomes[0])
+        
+        #print("HEIII")
+        
+        placebo_estimate_reward = np.zeros(10)
+        drug_estimate_reward = np.zeros(10)
+        
+        for i in range(10):
+            placebo_estimate_reward[i] = placebo_prob_outcomes[i][0]*self.reward(0, 0) + placebo_prob_outcomes[i][1]*self.reward(0, 1)
+            drug_estimate_reward[i] = drug_prob_outcomes[i][0]*self.reward(1, 0) + drug_prob_outcomes[i][1]*self.reward(1, 1)
+        
+        
         # Estimate the reward.
         # Reward takes action and outcome
         # E[f(X)] = \sum_x p(x)*f(x), X is a discrete RV
-        placebo_estimate_reward = placebo_prob_outcomes[0,0]*self.reward(0, 0) + placebo_prob_outcomes[0,1]*self.reward(0, 1)
-        drug_estimate_reward = drug_prob_outcomes[0,0]*self.reward(1, 0) + drug_prob_outcomes[0,1]*self.reward(1, 1)
+        #placebo_estimate_reward = placebo_prob_outcomes[0,0]*self.reward(0, 0) + placebo_prob_outcomes[0,1]*self.reward(0, 1)
+        #drug_estimate_reward = drug_prob_outcomes[0,0]*self.reward(1, 0) + drug_prob_outcomes[0,1]*self.reward(1, 1)
         
         # Return the best action
-        if (placebo_estimate_reward >= drug_estimate_reward):
+        if (sum(placebo_estimate_reward) >= sum(drug_estimate_reward)):
             return 0
         else:
             return 1
@@ -217,7 +261,7 @@ class NNRecommender:
             # Under construction, but works with the TestRecommender you have provided.  
             self.fit_treatment_outcome(user.reshape(1,130), action, outcome)
         return None
-    
+
     # After all the data has been obtained, do a final analysis. This can consist of a number of things:
     # 1. Recommending a specific fixed treatment policy
     # 2. Suggesting looking at specific genes more closely

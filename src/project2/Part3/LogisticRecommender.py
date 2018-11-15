@@ -33,7 +33,7 @@ class LogisticRecommender:
     # Set the recommender with a default number of actions and outcomes.  This is
     # because the number of actions in historical data can be
     # different from the ones that you can take with your policy.
-    def __init__(self, n_actions, n_outcomes):
+    def __init__(self, n_actions, n_outcomes, allow_update = 1):
         self.n_actions = n_actions
         self.n_outcomes = n_outcomes
         self.reward = self._default_reward
@@ -46,6 +46,12 @@ class LogisticRecommender:
         self.actions = None
         self.outcome = None
         self.fitted = False
+        
+        # If we are allowed to update the model. That is
+        # if we call fit_treatment_outcome in observe with the new data
+        # or not. Default is allowed, but in Exercise 3 subquestion 2 we do not
+        # allow this
+        self.allow_update = allow_update
         
 
     ## By default, the reward is just equal to the outcome, as the actions play no role.
@@ -204,9 +210,10 @@ class LogisticRecommender:
     # Observe the effect of an action. This is an opportunity for you
     # to refit your models, to take the new information into account.
     def observe(self, user, action, outcome):
-        # We refit the model with the new data
-        # Under construction, but works with the TestRecommender you have provided.  
-        self.fit_treatment_outcome(user.reshape(1,130), action, outcome)
+        if (self.allow_update == 1):
+            # We refit the model with the new data
+            # Under construction, but works with the TestRecommender you have provided.  
+            self.fit_treatment_outcome(user.reshape(1,130), action, outcome)
         return None
 
     # After all the data has been obtained, do a final analysis. This can consist of a number of things:

@@ -22,10 +22,11 @@
 
 from sklearn import linear_model
 from sklearn.neural_network import MLPClassifier
+from sklearn.cluster import KMeans
 import numpy as np
 import pandas
 
-class NNRecommender:
+class NNRecommenderCluster:
 
     #################################
     # Initialise
@@ -33,12 +34,10 @@ class NNRecommender:
     # Set the recommender with a default number of actions and outcomes.  This is
     # because the number of actions in historical data can be
     # different from the ones that you can take with your policy.
-    def __init__(self, n_actions, n_outcomes, allow_update = 1):
+    def __init__(self, n_actions, n_outcomes):
         self.n_actions = n_actions
         self.n_outcomes = n_outcomes
         self.reward = self._default_reward
-
-        # These variables are for the third part of the project. To be continued.
         # It is stupid to store the data in the model
         # but it makes the code more elegant in the
         # refiting procedure
@@ -47,17 +46,15 @@ class NNRecommender:
         self.outcome = None
         self.fitted = False
         
-        # If we are allowed to update the model. That is
-        # if we call fit_treatment_outcome in observe with the new data
-        # or not. Default is allowed, but in Exercise 3 subquestion 2 we do not
-        # allow this
-        self.allow_update = allow_update
+        
+        # This we need for the kmenas
+        self.centers = np.zeros((2,128))
+        self.labels = None
         
 
     ## By default, the reward is just equal to the outcome, as the actions play no role.
     def _default_reward(self, action, outcome):
         return outcome
-
 
     # Set the reward function r(a, y)
     def set_reward(self, reward):
@@ -73,6 +70,9 @@ class NNRecommender:
     # model instead.
     def fit_data(self, data):
         print("Preprocessing data")
+        kmeans_model = KMeans(n_clusters=2, random_state=1).fit(data)
+        self.centers = kmeans_model.cluster_centers_
+        self.labels = kmeans_model.labels_
         return None
 
 
@@ -80,41 +80,37 @@ class NNRecommender:
     ## Here we assume that the outcome is a direct function of data and actions
     ## This model can then be used in estimate_utility(), predict_proba() and recommend()
     def fit_treatment_outcome(self, data, actions, outcome):
-        # This function is more complicated than it needs to be right now
-        # This version of the code allows us to update the data, the actions and tha outcomes
-        # and retrain the model with the new data we got from the observe function.
-
-        # First time we fit the model we need to initilazie the variables.
+        # First time we fit the model
         if (self.fitted == False):
             self.data = data
             self.actions = actions
             self.outcome = outcome
-
-            # Set fitted to true since we have a fitted model now
             self.fitted = True
-
+            self.fit_data(data)
         else:
-            # Refitting the model. Add the new data to the training set.
+            # Refitting the model. Add the new data
             self.data = np.concatenate((self.data, data), axis=0)
             self.actions = np.concatenate((self.actions, np.array([actions]).reshape(1,1)), axis=0)
             self.outcome = np.concatenate((self.outcome, np.array([outcome]).reshape(1,1)), axis=0)
-        
-
+            self.fit_data(self.data)
+            
         print("Fitting treatment outcomes")
-
-        # We choose a NN model 
-        self.model = MLPClassifier(solver='lbfgs', alpha=1e-5,
-                                  hidden_layer_sizes=(5, 2), random_state=1)
-       
-
-        # Combine data and actions into a common dataset
+        self.model0 = MLPClassifier(solver='lbfgs', alpha=1e-5,
+                                   hidden_layer_sizes=(5, 2), random_state=1)
+        
+        self.model1 = MLPClassifier(solver='lbfgs', alpha=1e-5,
+                                   hidden_layer_sizes=(5, 2), random_state=1)
+        
+        # Add actions to the dataset
         data2 = pandas.DataFrame(self.data)
         data2['a'] = self.actions
-
-        # We train the Neural Network
-        self.model.fit(data2.values, np.ravel(self.outcome))
+        data2 = data2.values
+        
+        data0 = data2[self.labels == 0, :]
+        data1 = data2[self.labels == 1, :]
+        self.model0.fit(data0, np.ravel(self.outcome[self.labels == 0]))
+        self.model1.fit(data1, np.ravel(self.outcome[self.labels == 1]))
         return None
-
 
     ## Estimate the utility of a specific policy from historical data (data, actions, outcome),
     ## where utility is the expected reward of the policy.
@@ -128,64 +124,42 @@ class NNRecommender:
         if (policy == None):
             # We compute the estimated utility from the data
             # reawrd is a function that takes in actions and outcome
-            # This is the same as in the jupyter notebook
-            return sum(self.reward(actions, outcome))
-        
-        else:    
+            return self.reward(actions, outcome)
+        else:
             # We have a policy
-            # we assume it is an object of class NNRecommender, which has been fitted
-            # If the policy has not been fitted we return -infinity
-            if (policy.fitted == False):
-                return -float('inf')
-
-            # We assume that we only get data, actions = None, and Outcome = None
-            # And that we have to use the model to find the best actions
-            # Then we use predict_proba to find the probability for the outcomes
-            estimated_utility = 0
+            # So we assume actions and outcome are 'None'
+            # We look at what the policy recommends
+            recommended_action = policy.recommend(data)
+            predict_proba_recommended_action = self.predict_proba(data, recommended_action)
             
-            # For each action in data we want to find the estimated reward
-            for row in range(data.shape[0]):
-                # Fancy printout
-                if ((row + 1) % 100) == 0:
-                    print("Neural Network estimating utility %6d of %d" % (row + 1, data.shape[0]))
-
-                # This iteration's data
-                iter_data = np.array(data[row].reshape(1,130))
-                
-                # Start by finding the recommended action
-                recommended_action = policy.recommend(iter_data)
-                
-                # Find the probabilities for the outcome
-                predict_proba_recommended_action = policy.predict_proba(iter_data, recommended_action)
-                
-                # E[f(X)] = \sum_x p(x)*f(x), X is a discrete RV
-                # We use self.reward since we want to use this instance version of reward to calculate the reward
-                # Policy can be another instance of Recommender (with the same interface) which calculates the best 
-                # action in another way and based on another reward
-                estimated_reward = predict_proba_recommended_action[0,0]*self.reward(recommended_action, 0) + predict_proba_recommended_action[0,1]*self.reward(recommended_action, 1)
-           
-                # Add the reward
-                estimated_utility += estimated_reward
-                
-            return estimated_utility
+            # E[X] = \sum_x p(x)*x
+            estimated_reward = predict_proba_recommended_action[0,0]*self.reward(recommended_action, 0) + predict_proba_recommended_action[0,1]*self.reward(recommended_action, 1)
+            return estimated_reward
             
         
     # Return a distribution of effects for a given person's data and a specific treatment.
     # This should be an numpy.array of length self.n_outcomes
     def predict_proba(self, data, treatment):
-        # We assume that the model has been fitted
-        # Could have tested it as above.
-
-        # Combine the data and action/treatment.
+        # We assume we have a model here. NN
         data2 = pandas.DataFrame(data)
         data2['a'] = treatment 
-        return self.model.predict_proba(data2)
+        
+        # Check which group the new patient belongs to:
+        dist_to_center_0 = np.sum(np.square(data + self.centers[0]))
+        dist_to_center_1 = np.sum(np.square(data + self.centers[1]))
+        
+        if (dist_to_center_0 <= dist_to_center_1):
+            print("Use model 0")
+            return self.model0.predict_proba(data2)
+        else:
+            print("Use model 1")
+            return self.model1.predict_proba(data2)
     
     # Return recommendations for a specific user datum
     # This should be an integer in range(self.n_actions)
     def recommend(self, user_data):
         # We want to maximize the utility
-        # So we chose the action which yields the best estimated reward
+        # So we chose the action which yields the best reward
         
         # Due to Christos' change in the generator file in the latest
         # update we have to reshape the data.
@@ -195,13 +169,15 @@ class NNRecommender:
         placebo_prob_outcomes = self.predict_proba(user_data, 0)
         drug_prob_outcomes = self.predict_proba(user_data, 1)
         
+        #print(placebo_prob_outcomes)
+        #print(placebo_prob_outcomes[0,0])
+        #print(placebo_prob_outcomes[0,1])
+        
         # Estimate the reward.
         # Reward takes action and outcome
-        # E[f(X)] = \sum_x p(x)*f(x), X is a discrete RV
         placebo_estimate_reward = placebo_prob_outcomes[0,0]*self.reward(0, 0) + placebo_prob_outcomes[0,1]*self.reward(0, 1)
         drug_estimate_reward = drug_prob_outcomes[0,0]*self.reward(1, 0) + drug_prob_outcomes[0,1]*self.reward(1, 1)
         
-        # Return the best action
         if (placebo_estimate_reward >= drug_estimate_reward):
             return 0
         else:
@@ -212,12 +188,11 @@ class NNRecommender:
     # Observe the effect of an action. This is an opportunity for you
     # to refit your models, to take the new information into account.
     def observe(self, user, action, outcome):
-        if (self.allow_update == 1):
-            # We refit the model with the new data
-            # Under construction, but works with the TestRecommender you have provided.  
-            self.fit_treatment_outcome(user.reshape(1,130), action, outcome)
+        self.fit_treatment_outcome(user.reshape(1,130), action, outcome)
         return None
     
+    
+        
     # After all the data has been obtained, do a final analysis. This can consist of a number of things:
     # 1. Recommending a specific fixed treatment policy
     # 2. Suggesting looking at specific genes more closely
