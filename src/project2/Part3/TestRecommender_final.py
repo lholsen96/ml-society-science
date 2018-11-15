@@ -13,7 +13,8 @@ def test_policy(generator, policy, reward_function, T):
     
     # Set 
     #np.random.seed(314159)
-    np.random.seed(123)
+    #np.random.seed(123) Ga veldig bra log boot with update
+    np.random(271828)
     u = 0
     for t in range(T):
         # We generate 1 new pasient
@@ -58,6 +59,15 @@ policy_logistic.fit_treatment_outcome(features, actions, outcome)
 # We allow no update of the policy. THis in Exercise 3 subquestion 2
 policy_logistic_no_update = policy_factory_logistic(generator.get_n_actions(), generator.get_n_outcomes(), 0)
 policy_logistic_no_update.fit_treatment_outcome(features, actions, outcome)
+
+import LogisticRecommenderBoot
+policy_factory_logistic_boot = LogisticRecommenderBoot.LogisticRecommenderBoot
+policy_logistic_boot = policy_factory_logistic_boot(generator.get_n_actions(), generator.get_n_outcomes())
+policy_logistic_boot.fit_treatment_outcome(features, actions, outcome)
+
+# We allow no update of the policy. THis in Exercise 3 subquestion 2
+policy_logistic_boot_no_update = policy_factory_logistic_boot(generator.get_n_actions(), generator.get_n_outcomes(),0)
+policy_logistic_boot_no_update.fit_treatment_outcome(features, actions, outcome)
 
 
 import NNRecommender
@@ -109,9 +119,13 @@ result_random = test_policy(generator, policy_random, default_reward_function, n
 
 # Check the other policies
 result_historical = test_policy(generator, policy_historical, default_reward_function, n_tests)
+
 result_logistic = test_policy(generator, policy_logistic, default_reward_function, n_tests)
 result_logistic_no_update = test_policy(generator, policy_logistic_no_update, default_reward_function, n_tests)
 result_logistic_cluster = test_policy(generator, policy_logistic_cluster, default_reward_function, n_tests)
+result_logistic_boot = test_policy(generator, policy_logistic_boot, default_reward_function, n_tests)
+result_logistic_boot_no_update = test_policy(generator, policy_logistic_boot_no_update, default_reward_function, n_tests)
+
 result_NN = test_policy(generator, policy_NN, default_reward_function, n_tests)
 result_NN_no_update = test_policy(generator, policy_NN_no_update, default_reward_function, n_tests)
 result_NN_cluster = test_policy(generator, policy_NN_cluster, default_reward_function, n_tests)
@@ -124,6 +138,8 @@ print("Random:             %7.4f" % result_random)
 print("Historical:         %7.4f" % result_historical)
 print("Logistic:           %7.4f" % result_logistic)
 print("Logistic no update: %7.4f" % result_logistic_no_update)
+print("Logistic boot:      %7.4f" % result_logistic_boot)
+print("Logistic boot no:   %7.4f" % result_logistic_boot_no_update)
 print("Logistic cluster:   %7.4f" % result_logistic_cluster)
 print("Neural Network:     %7.4f" % result_NN)
 print("NN no update:       %7.4f" % result_NN_no_update)
