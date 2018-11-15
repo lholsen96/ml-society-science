@@ -266,3 +266,26 @@ Logistic cluster:   48.0000
 Neural Network:     48.0000
 NN no update:       48.0000
 NN cluster:         47.0000
+
+Har nå også lagt til log boot with and without update
+Total rewards (max is 100):
+Treatment   1:      48.0000
+Treatment   2:      43.0000
+Treatment 127:       5.0000
+Treatment  11:       5.0000
+Treatment 106:       4.0000
+Treatment 111:       4.0000
+Treatment  26:       4.0000
+Treatment  92:       4.0000
+Treatment   9:       4.0000
+Treatment  86:       4.0000
+Random:             44.0000
+Historical:          8.0000
+Logistic:           48.0000
+Logistic no update: 48.0000
+Logistic boot:      62.0000
+Logistic boot no:   48.0000
+Logistic cluster:   48.0000
+Neural Network:     48.0000
+NN no update:       48.0000
+NN cluster:         47.0000
