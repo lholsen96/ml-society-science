@@ -48,7 +48,7 @@ generator = data_generation.DataGenerator()
 
 import LogisticRecommenderBoot
 policy_factory_logistic_boot = LogisticRecommenderBoot.LogisticRecommenderBoot
-policy_logistic_boot = policy_factory_logistic_boot(generator.get_n_actions(), generator.get_n_outcomes(),0)
+policy_logistic_boot = policy_factory_logistic_boot(generator.get_n_actions(), generator.get_n_outcomes(), 1)
 policy_logistic_boot.fit_treatment_outcome(features, actions, outcome)
 
 # Run an online test with the same number of actions

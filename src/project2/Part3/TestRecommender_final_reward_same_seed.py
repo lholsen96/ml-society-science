@@ -5,37 +5,62 @@ def default_reward_function(action, outcome):
 
 # This is the reward function given to us in the second part of the project
 def reward_function(action, outcome):
-    return -0.1*action + outcome
+    # CHanged the reward. Assume all medicins have the same cost/must be 10%
+    # more efficient than placebo.
+    if (action >= 1): 
+        return -0.1 + outcome
+    else: 
+        return outcome
+    
+#def reward_function(action, outcome):
+#    return -0.1*action + outcome
+   
 
 
 def test_policy(generator, policy, reward_function, T):
     policy.set_reward(reward_function)
     
     # Set 
-    #np.random.seed(314159)
-    np.random.seed(123) #Ga veldig bra log boot with update
-    #np.random.seed(271828)
-    #np.random.seed(1996)
+    #seed_number = 3567
+    #seed_number = 367482
+    #seed_number = 367
+    #seed_number = 150
+    #seed_number = 157157
+    #seed_number = 199618
+    #seed_number = 100018
+    #seed_number = 530018
+    seed_number = 43018
+    seed_number = 73018
+    seed_number = 93018
+    seed_number = 113018
+    seed_number = 153018
+    seed_number = 143018
+    seed_number = 177700
+    seed_number = 197700
+    seed_number = 217700
+    seed_number = 317700
+    seed_number = 337700
+    seed_number = 357700
+    seed_number = 457700
     
-    #np.random.seed(1997)
-    #np.random.seed(1998)
     
-    #np.random.seed(1999)
-    #np.random.seed(2000)
+    
     u = 0
     
     # Not placebo
     total_given_treatment = 0
     for t in range(T):
+        np.random.seed(seed_number + t)
         
         # We generate 1 new pasient
         x = generator.generate_features()
         # Find the best action, from our model
         a = policy.recommend(x)
-        print(a)
+
         if (a != 0): total_given_treatment += 1
         # Generate the outcome based on user_data and action
         y = generator.generate_outcome(x, a)
+        print(a)
         # Add the utility/reward
         u += reward_function(a, y)
         # Let the policy now about the result
@@ -82,6 +107,11 @@ policy_logistic_boot.fit_treatment_outcome(features, actions, outcome)
 policy_logistic_boot_no_update = policy_factory_logistic_boot(generator.get_n_actions(), generator.get_n_outcomes(),0)
 policy_logistic_boot_no_update.fit_treatment_outcome(features, actions, outcome)
 
+import LogisticRecommenderForce
+policy_factory_logistic_force = LogisticRecommenderForce.LogisticRecommenderForce
+policy_logistic_force = policy_factory_logistic_force(generator.get_n_actions(), generator.get_n_outcomes(), force_alt_med = 0, force_action = 2)
+policy_logistic_force.fit_treatment_outcome(features, actions, outcome)
+
 
 import NNRecommender
 policy_factory_NN = NNRecommender.NNRecommender
@@ -92,6 +122,11 @@ policy_NN.fit_treatment_outcome(features, actions, outcome)
 policy_NN_no_update = policy_factory_NN(generator.get_n_actions(), generator.get_n_outcomes(), 0)
 policy_NN_no_update.fit_treatment_outcome(features, actions, outcome)
 
+
+import NNRecommenderForce
+policy_factory_NN_force = NNRecommenderForce.NNRecommenderForce
+policy_NN_force = policy_factory_NN_force(generator.get_n_actions(), generator.get_n_outcomes(), force_alt_med = 0, force_action = 2)
+policy_NN_force.fit_treatment_outcome(features, actions, outcome)
 
 
 # For comparision we want to look at the extreme cases
@@ -113,8 +148,15 @@ policy_factory_NN_cluster = NNRecommenderCluster.NNRecommenderCluster
 policy_NN_cluster = policy_factory_NN_cluster(generator.get_n_actions(), generator.get_n_outcomes())
 policy_NN_cluster.fit_treatment_outcome(features, actions, outcome)
 
+import CheatRecommender
+policy_factory_cheat = CheatRecommender.CheatRecommender
+policy_cheat = policy_factory_cheat(generator.get_n_actions(), generator.get_n_outcomes())
+policy_cheat.fit_treatment_outcome(features, actions, outcome)
+
+
+
 # Run an online test with the same number of actions
-n_tests = 20
+n_tests = 100
 # Set seed for reproducibility
 #np.random.seed(314159)
 
@@ -122,26 +164,31 @@ n_tests = 20
 results_fixed_treatment = np.zeros((generator.get_n_actions(), 2))
 for i in range(len(results_fixed_treatment)):
     policy_temp = FixedTreatmentRecommender.FixedTreatmentRecommender(generator.get_n_actions(), generator.get_n_outcomes(), i)
-    results_fixed_treatment[i] = test_policy(generator, policy_temp, default_reward_function, n_tests)
+    results_fixed_treatment[i] = test_policy(generator, policy_temp, reward_function, n_tests)
 
 # Let's only look at the ten best gene treatments
 best_indices = np.argsort(-results_fixed_treatment[:,0])[:10]
 
 # Check what happens when we chose a randomly between placebo and drug1 and drug2
-result_random = test_policy(generator, policy_random, default_reward_function, n_tests)
+result_random = test_policy(generator, policy_random, reward_function, n_tests)
 
 # Check the other policies
-result_historical = test_policy(generator, policy_historical, default_reward_function, n_tests)
+result_historical = test_policy(generator, policy_historical, reward_function, n_tests)
 
-result_logistic = test_policy(generator, policy_logistic, default_reward_function, n_tests)
-result_logistic_no_update = test_policy(generator, policy_logistic_no_update, default_reward_function, n_tests)
-result_logistic_cluster = test_policy(generator, policy_logistic_cluster, default_reward_function, n_tests)
-result_logistic_boot = test_policy(generator, policy_logistic_boot, default_reward_function, n_tests)
-result_logistic_boot_no_update = test_policy(generator, policy_logistic_boot_no_update, default_reward_function, n_tests)
+result_logistic = test_policy(generator, policy_logistic, reward_function, n_tests)
+result_logistic_no_update = test_policy(generator, policy_logistic_no_update, reward_function, n_tests)
+result_logistic_cluster = test_policy(generator, policy_logistic_cluster, reward_function, n_tests)
+result_logistic_boot = test_policy(generator, policy_logistic_boot, reward_function, n_tests)
+result_logistic_boot_no_update = test_policy(generator, policy_logistic_boot_no_update, reward_function, n_tests)
+result_logistic_force = test_policy(generator, policy_logistic_force, reward_function, n_tests)
 
-result_NN = test_policy(generator, policy_NN, default_reward_function, n_tests)
-result_NN_no_update = test_policy(generator, policy_NN_no_update, default_reward_function, n_tests)
-result_NN_cluster = test_policy(generator, policy_NN_cluster, default_reward_function, n_tests)
+
+result_NN = test_policy(generator, policy_NN, reward_function, n_tests)
+result_NN_no_update = test_policy(generator, policy_NN_no_update, reward_function, n_tests)
+result_NN_cluster = test_policy(generator, policy_NN_cluster, reward_function, n_tests)
+result_NN_force = test_policy(generator, policy_NN_force, reward_function, n_tests)
+
+result_cheat = test_policy(generator, policy_cheat, reward_function, n_tests)
 
 print("Total rewards (max is %d):" %n_tests)
 for i in best_indices:
@@ -154,10 +201,15 @@ print("Logistic no update: %7.4f\t# of Treatments: %3d" % (result_logistic_no_up
 print("Logistic boot:      %7.4f\t# of Treatments: %3d" % (result_logistic_boot[0], result_logistic_boot[1]))
 print("Logistic boot no:   %7.4f\t# of Treatments: %3d" % (result_logistic_boot_no_update[0], result_logistic_boot_no_update[1]))
 print("Logistic cluster:   %7.4f\t# of Treatments: %3d" % (result_logistic_cluster[0], result_logistic_cluster[1]))
+print("Logistic force:     %7.4f\t# of Treatments: %3d" % (result_logistic_force[0], result_logistic_force[1]))
 print("Neural Network:     %7.4f\t# of Treatments: %3d" % (result_NN[0], result_NN[1]))
 print("NN no update:       %7.4f\t# of Treatments: %3d" % (result_NN_no_update[0], result_NN_no_update[1]))
 print("NN cluster:         %7.4f\t# of Treatments: %3d" % (result_NN_cluster[0], result_NN_cluster[1]))
+print("NN force:           %7.4f\t# of Treatments: %3d" % (result_NN_force[0], result_NN_force[1]))
+print("Cheat Recommender:  %7.4f\t# of Treatments: %3d" % (result_cheat[0], result_cheat[1]))
 
 
 
 #policy.final_analysis()
+
+      

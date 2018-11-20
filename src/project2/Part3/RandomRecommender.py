@@ -90,7 +90,7 @@ class RandomRecommender:
     # Return recommendations for a specific user datum
     # This should be an integer in range(self.n_actions)
     def recommend(self, user_data):
-        return np.random.choice(3,1)[0]
+        return np.random.choice(2,1)[0]
         
 
     # Observe the effect of an action. This is an opportunity for you
